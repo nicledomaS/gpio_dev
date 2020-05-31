@@ -2,4 +2,5 @@
 # gpio_dev
 
 `cmake -B build`
+
 `cmake --build build`
