@@ -5,10 +5,12 @@
 
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
+#include <string.h>
 
 #include <linux/gpio.h>
 
-namespace gpio_lib
+namespace gpio_dev
 {
 
 namespace
@@ -17,7 +19,7 @@ namespace
     int open(const std::string& devName)
     {
         // TODO: throw exception 
-
+        
         return ::open(devName.c_str(), 0);
     }
 
@@ -39,7 +41,6 @@ GpioChip::GpioChip(const std::string& devName, const std::string& label)
     m_chipInfo(initChipInfo(m_fd)),
     m_gpioData(std::make_unique<gpiohandle_data>())
 {
-
 }
 
 GpioChip::~GpioChip()
@@ -50,7 +51,13 @@ GpioChip::~GpioChip()
 void GpioChip::registerLine(unsigned int line)
 {
     m_lines.insert(line);
-    m_fdSetter = requestLine(m_fd, m_lines, GPIOHANDLE_REQUEST_OUTPUT, *m_gpioData, m_label);
+    doRequestLine();
+}
+
+void GpioChip::unregisterLine(unsigned int line)
+{
+    m_lines.erase(line);
+    doRequestLine();
 }
 
 void GpioChip::setValue(unsigned int line, uint8_t value)
@@ -70,13 +77,13 @@ void GpioChip::setValue(unsigned int line, uint8_t value)
 uint8_t GpioChip::getValue(unsigned int line)
 {
     auto pos = findLine(line);
-    if(pos >= 0)
+    if(pos >= 0 && getValues(m_fdSetter, *m_gpioData) >= 0)
     {
-        getValues(m_fdSetter, *m_gpioData);
         return m_gpioData->values[pos];
     }
     else
     {
+        std::cout << "Error: " << strerror(errno) << std::endl;
         // TODO: throw exception
     } 
     return 0;
@@ -90,4 +97,10 @@ int GpioChip::findLine(unsigned int line) const
     return std::distance(m_lines.begin(), it);
 }
 
-} // gpio_lib
+void GpioChip::doRequestLine()
+{
+    close(m_fdSetter);
+    m_fdSetter = requestLine(m_fd, m_lines, GPIOHANDLE_REQUEST_OUTPUT, *m_gpioData, m_label);
+}
+
+} // gpio_dev

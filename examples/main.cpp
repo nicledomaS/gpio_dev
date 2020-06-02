@@ -1,4 +1,5 @@
 #include "GpioChip.h"
+#include "Gpio.h"
 
 #include <fcntl.h>
 #include <unistd.h>
@@ -18,9 +19,9 @@ int main (int argc, char** argv)
 {
     std::cout << "Start program" << std::endl;
 
-    gpio_lib::GpioChip chip(DeviceName, "GpioProto");
-    chip.registerLine(0);
-    chip.registerLine(1);
+    auto chip = std::make_shared<gpio_dev::GpioChip>(DeviceName, "GpioProto");
+    gpio_dev::Gpio gpio_0(0, chip);
+    gpio_dev::Gpio gpio_1(1, chip);
 
     bool check = false;
 
@@ -28,14 +29,14 @@ int main (int argc, char** argv)
     {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         
-        auto value_0 = chip.getValue(0);
-        auto value_1 = chip.getValue(1);
+        auto value_0 = gpio_0.value();
+        auto value_1 = gpio_1.value();
 
         std::cout << "Current value_0: " << std::to_string(value_0) << std::endl;
         std::cout << "Current value_1: " << std::to_string(value_1) << std::endl;
 
-        chip.setValue(0, check ? 1 : 0);
-        chip.setValue(1, check ? 0 : 1);
+        gpio_0.setValue(check ? 1 : 0);
+        gpio_1.setValue(check ? 0 : 1);
 
         check = !check;
     }

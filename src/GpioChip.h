@@ -6,7 +6,7 @@
 struct gpiochip_info;
 struct gpiohandle_data;
 
-namespace gpio_lib
+namespace gpio_dev
 {
 
 class GpioChip
@@ -16,12 +16,14 @@ public:
     ~GpioChip();
 
     void registerLine(unsigned int line);
+    void unregisterLine(unsigned int line);
 
     void setValue(unsigned int line, uint8_t value);
     uint8_t getValue(unsigned int line);
 
 private:
     int findLine(unsigned int line) const;
+    void doRequestLine();
 
 private:
     int m_fd;
@@ -32,4 +34,4 @@ private:
     std::unique_ptr<gpiohandle_data> m_gpioData;
 };
 
-} // gpio_lib
+} // gpio_dev
