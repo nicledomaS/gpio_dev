@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-namespace gpio_lib
+namespace gpio_dev
 {
 
 int getChipInfo(int fd, gpiochip_info& chipInfo)
@@ -62,4 +62,4 @@ int setValues(int fd, const gpiohandle_data& data)
     return ioctl(fd, GPIOHANDLE_SET_LINE_VALUES_IOCTL, &data);
 }
 
-} // gpio_lib
+} // gpio_dev

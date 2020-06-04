@@ -9,7 +9,7 @@ struct gpioline_info;
 
 struct gpiohandle_data;
 
-namespace gpio_lib
+namespace gpio_dev
 {
 
 int getChipInfo(int fd, gpiochip_info& chipInfo);
@@ -25,4 +25,4 @@ int requestLine(
 int getValues(int fd, gpiohandle_data& data);
 int setValues(int fd, const gpiohandle_data& data);
 
-} // gpio_lib
+} // gpio_dev
