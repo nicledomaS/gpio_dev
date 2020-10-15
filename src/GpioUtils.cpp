@@ -32,7 +32,9 @@ int requestLine(
     memset(&req, 0, sizeof(gpiohandle_request));
     memset(&data, 0, sizeof(gpiohandle_data));
     
-    strcpy(req.consumer_label, consumerLabel.c_str());
+    auto consumerLabelLength = sizeof(req.consumer_label) - 1;
+    auto length = consumerLabel.size() < consumerLabelLength ? consumerLabel.size() : consumerLabelLength;
+    strncpy(req.consumer_label, consumerLabel.c_str(), length);
     req.flags = flag;
     req.lines = lines.size();
 
